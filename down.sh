@@ -27,18 +27,28 @@ name="$1"
 droplets=$(doctl compute droplet list -o json)
 selected=$(echo $droplets | jq -r '.[].name' | grep "$name")
 
+backup() {
+    name="$1"
+    $HOME/.axiom/interact/axiom-backup $name
+    mkdir -p ./output/$name/
+    cp "$HOME/.axiom/boxes/$name/$name.txt" "./output/$name.txt"
+    $HOME/.axiom/interact/axiom-boxes rm $name
+    $HOME/.axiom/interact/axiom-rm $name -f
+}
+
 i=1
 total=$(echo $selected | tr ' ' '\n' | wc -l)
 for name in $selected
 do
-    $HOME/.axiom/interact/axiom-backup $name
-    mkdir -p ./output/$name/
-    cp $HOME/.axiom/boxes/$name/$name.masscan ./output/$name/$name.masscan
-    $HOME/.axiom/interact/axiom-boxes rm $name
-    $HOME/.axiom/interact/axiom-rm $name -f
-
-    i=$((i+1))
+#        backup "$name" &
+        sleep 0.3
+        axiom-rm "$name" -f &
+        i=$((i+1))
 done
 
-cat ./output/$name/*.masscan | sort -u > ./output/$name.masscan
-rm -rf ./output/$name/
+sleep 10
+echo "waiting to finish, press enter to merge and cleanup..."
+read
+
+cat ./output/$name*.txt | sort -u > ./output/$name.masscan
+rm -rf ./output/$name*.txt
