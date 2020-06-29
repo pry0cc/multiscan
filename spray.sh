@@ -37,6 +37,8 @@ a=1; for f in $(bash -c "ls | grep x"); do axiom-boxes new $name$a; mv $f ~/.axi
 for dname in $selected
 do
     cmd="wc -l $name$i.txt"
+    # cmd="curl http://easyasn.xyz/all/ranges.txt | grep -v \":\" > ranges.txt && sudo masscan -iL ranges.txt --rate=10000 -p443 --banners --shard $i/$total -oG $dname.masscan && sudo chown op:users $dname.masscan"
+    $HOME/.axiom/interact/axiom-execb "$cmd" "$name"
     $HOME/.axiom/interact/axiom-restore "$name$i" "$dname"
     axiom-boxes rm $name$i
     $HOME/.axiom/interact/axiom-execb "$cmd" "$dname" &
